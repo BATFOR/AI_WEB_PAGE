@@ -1,0 +1,22 @@
+{
+  "status": 1,
+  "input": "北京天安门在中国",
+  "result": [
+    {
+      "entity": "北京",
+      "span_index": [
+        0,
+        1
+      ],
+      "type": "LOC"
+    },
+    {
+      "entity": "中国",
+      "span_index": [
+        6,
+        7
+      ],
+      "type": "LOC"
+    }
+  ]
+}
