@@ -17,64 +17,55 @@
     <link href="../static/css/plugins/iCheck/custom.css" rel="stylesheet">
     <link href="../static/css/animate.css" rel="stylesheet">
     <link href="../static/css/style.css?v=4.1.0" rel="stylesheet">
-
-</head>
+    </head>
 
 <body class="gray-bg">
     <div class="wrapper wrapper-content">
         <div class="row">
             <div class="animated fadeInRight">
                 <div class="mail-box-header">
-                    <h2><strong>Relation Recognition</strong></h2>
+                    <h2><strong>Entity-Relationship Triple Extraction</strong></h2>
                     <div class="mail-tools tooltip-demo m-t-md">
 
 
                         <h3>
-                        <span class="font-noraml">Entity relation recognition task is about identifying the relationships between entities in text, aiding in understanding the connections and semantic associations between them. </span>
+                        <span class="font-noraml">Entity-relationship triple extraction aims to extract named entities and potential relationships between them from text. </span>
                         </h3>
                     </div>
                 </div>
                 <div class="mail-box">
 
+
                     <div class="mail-body">
                         <h3>Model</h3>
                         <div>
-                            <h3>Hierarchical Visual Semantic Guidance（HVSG）</h3>
+                            <h3>Pipeline Model of HGR+HVSG</h3>
                         </div>
-                        <p style="font-size: 15px;">
-                        HVSG(Hierarchical Visual Semantic Guidance) model uses a BPE character encoder and Transformer context phrase encoder, and three types of words are embedded to represent words. This method considers the mapping relationship between entity-relationship knowledge in a visual context and entity relationship knowledge in a textual context, filling the gap of prior knowledge about relationships between textual entities and facilitating the inference of prior related knowledge. Specifically, this method first uses a single-stage entity localization method to extract salient local instance objects from the global visual context, reducing the influence of other redundant visual noise propagation. Then, it utilizes the semantic representation capability of convolutional neural networks to establish multi-level visual features for the global image and local object instances through a hierarchical visual semantic construction network. Finally, based on the affine transformation function, the visual and textual multi-level semantic features are fused using the visual semantic guidance module to incorporate the semantic information of visual entity relationships, thereby improving the accuracy of entity relationship inference and recognition. It was trained on the unmanned vessel maritime multimodal dataset.
+                        <p id="ner_model_desc" style="font-size: 15px;">
+                            The pipeline model first uses the named entity recognition model <a href="ner_model_detail.html">HGR</a> to extract entity words from a text and visual context and then calls the relationship recognition model <a href="re_model_detail.html">HVSG</a> to identify potential relationships between named entities. Finally, the pipeline model outputs the relational entity-relation triples identified from the text.
                         </p>
                     </div>
                     <div class="mail-body">
                         <h3>Demo</h3>
                         <div class="col-sm-12">
                             <h3  style="font-weight: normal">Example Inputs</h3>
-                            <select class="form-control" name="" id="re_example_sentence" style="padding-left: 8px;">
+                            <select class="form-control" name="" id="ner_example_sentence" style="padding-left: 8px;">
                                 <option style="display: none"></option>
-                                <option>作为无人装备企业代表之一，云洲智能携自主研发生产的多型海防级无人艇实艇重磅亮相，现场展示“空海潜”无人装备跨域协同，开设无人船艇远程操控舱，备受关注。</option>
                                 <option>调查使用了美国伍兹霍尔海洋研究所研发的无人潜艇</option>
+                                <option>作为无人装备企业代表之一，云洲智能携自主研发生产的多型海防级无人艇实艇重磅亮相，现场展示“空海潜”无人装备跨域协同，开设无人船艇远程操控舱，备受关注。</option>
+                                <option>“保护者”无人水面艇具备舰艇广函-和兵力保护、反恐、情报监视和侦察等功能</option>
                                 <option>无人艇可以安装武器遥控站，集成机枪、机关炮、榴弹发射器、小型导弹等武器</option>
-                                <option>“保护者”无人水面艇具备舰艇广函和兵力保护、反恐、情报监视和侦察等功能</option>
                             </select>
                         </div>
-                        <div class="row" style="padding-left: 15px;margin-top: 6em;">
-                            <div class="col-sm-6">
+                        <div style="margin-top: 6em;">
+                            <div class="col-sm-12">
                                 <h3  style="font-weight: normal">Sentence</h3>
                                 <div>
-                                    <input type="text" name="" class="form-control" placeholder="please enter text" id="re_input_sentence">
-                                </div>
-                            </div>
-                            <div class="col-sm-6">
-                                <h3  style="font-weight: normal;padding-left: 15px;">Entity</h3>
-                                <div class="col-sm-6">
-                                    <input id="head_entity" type="text" name="" class="form-control" placeholder="enter head entity in sentence">
-                                </div>
-                                <div class="col-sm-6" >
-                                    <input id="tail_entity" type="text" name="" class="form-control" placeholder="enter tail entity in sentence">
+                                    <input id="ner_input_sentence" type="text" name="" class="form-control" placeholder="please enter text" >
                                 </div>
                             </div>
                         </div>
-                        <div class="row" style="padding-left: 15px;margin-top: 4px;">
+                        <div style="margin-top: 6em;">
                             <div class="col-sm-12">
                                 <h3  style="font-weight: normal;">Image Path</h3>
                                 <div class="layui-upload">
@@ -83,15 +74,14 @@
                                     </button>
                                     <blockquote class="layui-elem-quote layui-quote-nm" style="margin-top: 11px;">
                                         <div class="layui-upload-list" id="upload-demo-preview" style="height: 90px;width: 100%;display: flex;justify-content: center;align-items: center;">
-                                            <img src="" alt="" style="width: 90px; height: 90px;">
+                                            <img src="" alt="" style="width: 90px; height: 90px;" id="show_img">
                                         </div>
                                     </blockquote>
                                 </div>
                             </div>
                         </div>
-
-                        <div class="row" style="padding-left: 30px" >
-                            <button class="btn btn-w-m btn-info" type="button" id="re_run_model">Run Model</button>
+                        <div style="padding-left: 15px;" >
+                            <button class="btn btn-w-m btn-info" type="button" style="margin-top: 4px;" id="ner_run_model">Run Model</button>
                         </div>
                     </div>
                     <div class="mail-body" id="result_panel">
@@ -102,31 +92,23 @@
                         </div>
                     </div>
                     <div class="clearfix"></div>
-
-
                 </div>
             </div>
         </div>
     </div>
 
-
     <!-- 全局js -->
     <script src="../static/js/jquery.min.js?v=2.1.4"></script>
     <script src="../static/js/bootstrap.min.js?v=3.3.6"></script>
 
-
-
     <!-- 自定义js -->
     <script src="../static/js/content.js?v=1.0.0"></script>
 
-
     <!-- iCheck -->
     <script src="../static/js/plugins/iCheck/icheck.min.js"></script>
-    <!-- Prettyfile -->
     <script src="../static/js/plugins/prettyfile/bootstrap-prettyfile.js"></script>
     <!-- 引入 layui.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/layui/2.8.6/layui.min.js" integrity="sha512-Ehmp24RDI3YEqzC79P1pT7GAcWvyaq9dbE9lbG9AwNYHlYCQNkElNbxok7aOEtRTtVqfiooXl0LkO9INAGO/aw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-
     <script>
         image_host = "http://58.199.166.122:9090/"
         $(document).ready(function () {
@@ -137,58 +119,41 @@
                 radioClass: 'iradio_square-green',
             });
 
-            $('#re_example_sentence').change(function (){
+            $('#ner_example_sentence').change(function (){
                 var selectedValue = $(this).val();
-                $("#re_input_sentence").val(selectedValue)
+                $("#ner_input_sentence").val(selectedValue);
                 if(selectedValue.includes("作为无人装备企业代表之一")){
-                    $("#head_entity").val("云洲智能")
-                    $("#tail_entity").val("多型海防级无人艇实艇")
-                    $('#upload-demo-preview img').attr('src', image_host+"getImg/yunzhouzhin.jpeg")
-                    $('#upload-demo-preview img').show();
+                    $('#show_img').attr('src', image_host+"getImg/yunzhouzhin.jpeg")
+                    $('#show_img').show();
                 }else if(selectedValue.includes("调查使用了美国伍兹")){
-                    $("#head_entity").val("美国伍兹霍尔海洋研究所")
-                    $("#tail_entity").val("无人潜艇")
-                    $('#upload-demo-preview img').attr('src', image_host+"getImg/huoerhaizi.jpg")
-                    $('#upload-demo-preview img').show();
+                    $('#show_img').attr('src', image_host+"getImg/huoerhaizi.jpg")
+                    $('#show_img').show();
                 }else if(selectedValue.includes("无人艇可以安装武器遥控站")){
-                    $("#head_entity").val("无人艇")
-                    $("#tail_entity").val("榴弹发射器")
-                    $('#upload-demo-preview img').attr('src', image_host+"getImg/wurenting-gongji.jpg")
-                    $('#upload-demo-preview img').show();
-                }else if(selectedValue.includes("无人水面艇具备舰艇广函和兵力保护")){
-                    $("#head_entity").val("“保护者”无人水面艇")
-                    $("#tail_entity").val("情报监视")
-                    $('#upload-demo-preview img').attr('src', image_host+"getImg/protector.jpg")
-                    $('#upload-demo-preview img').show();
+                    $('#show_img').attr('src', image_host+"getImg/wurenting-gongji.jpg")
+                    $('#show_img').show();
+                }else if(selectedValue.includes("和兵力保护、反恐、情报监视和侦察")){
+                    $('#show_img').attr('src', image_host+"getImg/protector.jpg")
+                    $('#show_img').show();
                 }
 
             });
-            $('#re_run_model').click(function () {
-                if($('#re_input_sentence').val().trim().length==0){
+            $('#ner_run_model').click(function () {
+                if($('#ner_input_sentence').val().trim().length==0){
                     alert("请输入待预测句子!")
                     return;
                 }
-                if($('#head_entity').val().trim().length==0 || $('#tail_entity').val().trim().length==0){
-                    alert("请输入头尾实体!")
-                    return;
-                }
-                var head_value = $('#head_entity').val().trim()
-                var tail_value = $('#tail_entity').val().trim()
-                if(!$('#re_input_sentence').val().trim().includes(head_value) || !$('#re_input_sentence').val().trim().includes(tail_value)){
-                    alert("请输入位于句子中的头尾实体!")
-                    return;
-                }
+
                 var formData = new FormData();
-                formData.append("sentence", $('#re_input_sentence').val());
-                formData.append("head", $('#head_entity').val());
-                formData.append("tail", $('#tail_entity').val());
-                if($('#ID-upload-demo-img').attr('src')!=""){
-                    formData.append("image", $('#ID-upload-demo-img').attr('src'));
+                formData.append("sentence", $('#ner_input_sentence').val());
+                if($('#upload-demo-preview img').attr('src')!=""){
+                    formData.append("image", $('#upload-demo-preview img').attr('src'));
                 }
+
                 // console.log(formData)
-                $('#re_run_model').prop('disabled', true);
+                $('#ner_run_model').prop('disabled', true);
                 $.ajax({
-                    url: 'http://58.199.166.122:8082/re',
+                    // url: '/data/ner_return.json',
+                    url: 'http://58.199.166.122:8083/trip',
                     method: "POST",
                     timeout: 0,
                     processData: false,
@@ -198,11 +163,19 @@
                     success: function (response) {
                         response = JSON.parse(response)
                         if(response.status == 1){
-                            var display_inupt = response.input.replace($('#head_entity').val(),"<ins>"+$('#head_entity').val()+"</ins>")
-                            display_inupt = display_inupt.replace($('#tail_entity').val(),"<ins>"+$('#tail_entity').val()+"</ins>")
-                            $("#result_input").html("Input: "+ display_inupt)
-                            var prediction = "（"+$('#head_entity').val() +"->"+ response.result+"->" +$('#tail_entity').val()+"）"
+                            var input_display = response.input;
 
+                            var entities = response.result.entities
+                            var trip_list = response.result.trip_list
+
+                            for (var item of entities){
+                                input_display = input_display.replace(item, "<ins>"+item+"</ins>")
+                            }
+                            var prediction = trip_list.join("｜")
+                            if(trip_list.length == 0){
+                                prediction = "None"
+                            }
+                            $("#result_input").html("Input: "+input_display)
                             $("#result_predict").text("Prediction: "+prediction);
                             $('#result_panel').show();
 
@@ -211,6 +184,7 @@
                         }
                         // 请求成功的回调函数
                         console.log(response);
+                        console.log(typeof(response));
                     },
                     error: function (xhr, status, error) {
                         // 请求失败的回调函数
@@ -218,7 +192,7 @@
                         console.error(error);
                     }
                 });
-                $('#re_run_model').prop('disabled', false)
+                $('#ner_run_model').prop('disabled', false)
             });
         });
 

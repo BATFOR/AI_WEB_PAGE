@@ -39,7 +39,7 @@
                     <div class="mail-body">
                         <h3>Model</h3>
                         <div>
-                            <h3>HGR</h3>
+                            <h3>Named Entity Recognition Method Based on <b>H</b>eterogeneous <b>G</b>raph <b>R</b>easoning of Visual Regions and Text Entities（HGR）</h3>
                         </div>
                         <p id="ner_model_desc" style="font-size: 15px;">
                             The HGR(Named Entity Recognition Method Based on <b>H</b>eterogeneous <b>G</b>raph <b>R</b>easoning of Visual Regions and Text Entities) model is a multimodal baseline model based on BERT. This method considers the contextual background information of local entities in text and images. First, based on the idea of text-image matching, it utilizes a visual refinement network to filter out visually irrelevant information. Second, it utilizes the multi-scale feature extraction capability of convolutional neural networks to extract implicit local regions from two-dimensional visual images and establish a visual region graph. At the same time, the text is segmented, and a semantic sliding window is set to build a textual entity graph. Then, based on the semantic similarity between graph nodes, the visual region graph and the textual entity graph are fused, and a region refinement network is used to filter redundant visual noise. Finally, a cross-inference network is used to provide visual-semantic injection for textual entities, achieving semantic disambiguation and recognition of text entities. It was trained on the unmanned vessel maritime multimodal dataset.
@@ -68,26 +68,15 @@
                         <div style="margin-top: 6em;">
                             <div class="col-sm-12">
                                 <h3  style="font-weight: normal;">Image Path</h3>
-<!--                                <div class="col-sm-12" style="padding-right: 0px;">-->
-<!--                                    <div id="file-pretty">-->
-<!--                                        <div class="form-group">-->
-<!--                                            <input id="image_file_to_up"  type="file" class="form-control" accept="image/*" maxlength="10240000">-->
-<!--                                        </div>-->
-<!--                                    </div>-->
-<!--                                </div>-->
-                                <button type="button" class="layui-btn" id="ID-upload-demo-btn">
-                                    <i class="layui-icon layui-icon-upload"></i> 选择图片
-                                </button>
-                                <div style="width: 132px;" id="img_display">
-                                    <div class="layui-upload-list">
-                                        <img class="layui-upload-img" id="ID-upload-demo-img"
-                                             style="width: 100%; height: 92px;">
-                                        <div id="ID-upload-demo-text"></div>
-                                    </div>
-<!--                                    <div class="layui-progress layui-progress-big" lay-showPercent="yes"-->
-<!--                                         lay-filter="filter-demo">-->
-<!--                                        <div class="layui-progress-bar" lay-percent=""></div>-->
-<!--                                    </div>-->
+                                <div class="layui-upload">
+                                    <button type="button" class="layui-btn" id="ID-upload-demo-btn-2">
+                                        <i class="layui-icon layui-icon-upload"></i> Select Image
+                                    </button>
+                                    <blockquote class="layui-elem-quote layui-quote-nm" style="margin-top: 11px;">
+                                        <div class="layui-upload-list" id="upload-demo-preview" style="height: 90px;width: 100%;display: flex;justify-content: center;align-items: center;">
+                                            <img src="" alt="" style="width: 90px; height: 90px;" id="show_img">
+                                        </div>
+                                    </blockquote>
                                 </div>
                             </div>
                         </div>
@@ -121,9 +110,10 @@
     <!-- 引入 layui.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/layui/2.8.6/layui.min.js" integrity="sha512-Ehmp24RDI3YEqzC79P1pT7GAcWvyaq9dbE9lbG9AwNYHlYCQNkElNbxok7aOEtRTtVqfiooXl0LkO9INAGO/aw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script>
+        image_host = "http://58.199.166.122:9090/"
         $(document).ready(function () {
             $('#result_panel').hide();
-            // $( 'input[type="file"]' ).prettyFile();
+            $('#upload-demo-preview img').hide();
             $('.i-checks').iCheck({
                 checkboxClass: 'icheckbox_square-green',
                 radioClass: 'iradio_square-green',
@@ -131,7 +121,21 @@
 
             $('#ner_example_sentence').change(function (){
                 var selectedValue = $(this).val();
-                $("#ner_input_sentence").val(selectedValue)
+                $("#ner_input_sentence").val(selectedValue);
+                if(selectedValue.includes("作为无人装备企业代表之一")){
+                    $('#show_img').attr('src', image_host+"getImg/yunzhouzhin.jpeg")
+                    $('#show_img').show();
+                }else if(selectedValue.includes("调查使用了美国伍兹")){
+                    $('#show_img').attr('src', image_host+"getImg/huoerhaizi.jpg")
+                    $('#show_img').show();
+                }else if(selectedValue.includes("无人艇可以安装武器遥控站")){
+                    $('#show_img').attr('src', image_host+"getImg/wurenting-gongji.jpg")
+                    $('#show_img').show();
+                }else if(selectedValue.includes("和兵力保护、反恐、情报监视和侦察")){
+                    $('#show_img').attr('src', image_host+"getImg/protector.jpg")
+                    $('#show_img').show();
+                }
+
             });
             $('#ner_run_model').click(function () {
                 if($('#ner_input_sentence').val().trim().length==0){
@@ -141,8 +145,8 @@
 
                 var formData = new FormData();
                 formData.append("sentence", $('#ner_input_sentence').val());
-                if($('#image_file_to_up').val()!=""){
-                    formData.append("image", $('#image_file_to_up')[0].files[0], $('#image_file_to_up')[0].files[0].name);
+                if($('#upload-demo-preview img').attr('src')!=""){
+                    formData.append("image", $('#upload-demo-preview img').attr('src'));
                 }
 
                 // console.log(formData)
@@ -194,47 +198,29 @@
             });
         });
 
-        var upload = layui.upload;
-        var layer = layui.layer;
-        var element = layui.element;
-        var $ = layui.$;
-        var uploadInst = upload.render({
-            elem: '#ID-upload-demo-btn',
-            url: 'https://httpbin.org/post', // 此处用的是第三方的 http 请求演示，实际使用时改成您自己的上传接口即可。
-            before: function (obj) {
-                // 预读本地文件示例，不支持ie8
-                obj.preview(function (index, file, result) {
-                    $('#ID-upload-demo-img').attr('src', result); // 图片链接（base64）
-                });
-
-                element.progress('filter-demo', '0%'); // 进度条复位
-                layer.msg('上传中', {icon: 16, time: 0});
-
-            },
-            done: function (res) {
-                // 若上传失败
-                if (res.code > 0) {
-                    return layer.msg('上传失败');
-                }
-                // 上传成功的一些操作
-                // …
-                $('#ID-upload-demo-text').html(''); // 置空上传失败的状态
-            },
-            error: function () {
-                // 演示失败状态，并实现重传
-                var demoText = $('#ID-upload-demo-text');
-                demoText.html('<span style="color: #FF5722;">上传失败</span> <a class="layui-btn layui-btn-xs demo-reload">重试</a>');
-                demoText.find('.demo-reload').on('click', function () {
-                    uploadInst.upload();
-                });
-            },
-            // 进度条
-            progress: function (n, elem, e) {
-                element.progress('filter-demo', n + '%'); // 可配合 layui 进度条元素使用
-                if (n == 100) {
+        layui.use(function () {
+            var upload = layui.upload;
+            var layer = layui.layer;
+            var $ = layui.$;
+            // 多图片上传
+            upload.render({
+                elem: '#ID-upload-demo-btn-2',
+                url: image_host+"img_up", // 此处用的是第三方的 http 请求演示，实际使用时改成您自己的上传接口即可。
+                multiple: false,
+                acceptMime: 'image/*',
+                size:5120,
+                before: function (obj) {
+                    // 预读本地文件示例，不支持ie8
+                    obj.preview(function (index, file, result) {
+                        $('#upload-demo-preview img').attr('src', result)
+                        $('#upload-demo-preview img').show();
+                    });
+                },
+                done: function (res) {
+                    $('#upload-demo-preview img').attr('src', image_host+res.img_path);
                     layer.msg('上传完毕', {icon: 1});
-                }
-            }
+                },
+            });
         });
     </script>
 
