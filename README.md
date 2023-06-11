@@ -5,7 +5,9 @@ source activate ljh_trip
 python app.py
 ```
 
-运行成功后，浏览器输入 http://ip:8080 即可访问该系统。
+运行成功后，浏览器输入 http://ip:8080 即可访问该系统。  
+
+![](ezgif.com-video-to-gif.gif)
 
 ## 主要文件说明
 目前包括的AI Demo及其对应网页如下:  
