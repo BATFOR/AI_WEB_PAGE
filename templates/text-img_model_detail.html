@@ -75,7 +75,7 @@
                             </div>
                         </div>
                         <div style="padding-left: 15px;" >
-                            <button id="sim_run_model" class="btn btn-w-m btn-info" type="button" style="margin-top: 4px;">Run Model</button>
+                            <button class="btn btn-w-m btn-info" type="button" style="margin-top: 4px;" id="sim_load_model">Load Model</button>&nbsp;&nbsp;<button id="sim_run_model" class="btn btn-w-m btn-info" type="button" style="margin-top: 4px;">Run Model</button>
                         </div>
                     </div>
                     <div class="mail-body" id="result_panel">
@@ -107,6 +107,39 @@
     <!-- 引入 layui.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/layui/2.8.6/layui.min.js" integrity="sha512-Ehmp24RDI3YEqzC79P1pT7GAcWvyaq9dbE9lbG9AwNYHlYCQNkElNbxok7aOEtRTtVqfiooXl0LkO9INAGO/aw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script>
+        function is_load(){
+            $.ajax({
+                    // url: '/data/ner_return.json',
+                    url: 'http://58.199.166.122:9094/is_model_load_msa',
+                    method: "POST",
+                    timeout: 0,
+                    processData: false,
+                    mimeType: "multipart/form-data",
+                    contentType: false,
+                    data: "{}",
+                    success: function (response) {
+                        response = JSON.parse(response)
+                        if(response.status == 1){
+                            $("#sim_load_model").text("Unload Model")
+                            $("#sim_run_model").attr("disabled",false);
+
+                        }else{
+                            $("#sim_load_model").text("Load Model")
+                            $("#sim_run_model").attr("disabled",true);
+                        }
+                        // 请求成功的回调函数
+                        console.log(response);
+                        console.log(typeof(response));
+                    },
+                    error: function (xhr, status, error) {
+                        // 请求失败的回调函数
+                        alert("请求失败！")
+                        console.error(error);
+                    }
+                });
+        }
+        is_load()
+
         image_host = "http://58.199.166.122:9090/"
         is_new_img_up = true
         $(document).ready(function () {
@@ -122,6 +155,45 @@
                 $('#upload-demo-preview').append('<img src="' + image_host+'getImg/house.png' + '" style="width: 90px; height: 90px;margin-left: 5px;">')
                 is_new_img_up = true
             });
+
+            $('#sim_load_model').click(function () {
+                var url = 'http://58.199.166.122:9094/unload_model_msa'
+                if($('#sim_load_model').text() == "Load Model"){
+                    url = 'http://58.199.166.122:9094/load_model_msa'
+                }
+
+                $.ajax({
+                    url: url,
+                    method: "POST",
+                    timeout: 0,
+                    processData: false,
+                    mimeType: "multipart/form-data",
+                    contentType: false,
+                    data: "{}",
+                    success: function (response) {
+                        response = JSON.parse(response)
+                        if(response.status == 1){
+                            if($('#sim_load_model').text() == "Load Model"){
+                                $('#sim_load_model').text('Unload Model')
+                            }else{
+                                $('#sim_load_model').text('Load Model')
+                            }
+                        }else{
+                            alert("请求失败！")
+                        }
+                        is_load()
+                        // 请求成功的回调函数
+                        console.log(response);
+                        console.log(typeof(response));
+                    },
+                    error: function (xhr, status, error) {
+                        // 请求失败的回调函数
+                        alert("请求失败！")
+                        console.error(error);
+                    }
+                });
+            });
+
             $('#sim_run_model').click(function () {
                 if($('#sim_input_sentence').val().trim().length==0){
                     alert("请输入待预测句子!")
